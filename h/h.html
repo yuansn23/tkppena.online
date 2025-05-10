@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MOODYZ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        :root {
+            --pink-light: #FF85A2;
+            --pink-deep: #FF4081;
+            --purple-light: #B388FF;
+            --purple-deep: #7C4DFF;
+            --bg-gradient: linear-gradient(135deg, var(--purple-deep), var(--pink-deep));
+            --card-gradient: linear-gradient(135deg, rgba(124, 77, 255, 0.9), rgba(255, 64, 129, 0.9));
+            --white: #FFFFFF;
+            --gray-light: #F5F5F5;
+            --gray-dark: #333333;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        
+        body {
+            background-color: #120d1a;
+            color: var(--white);
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(124, 77, 255, 0.2), rgba(0, 0, 0, 0) 70%),
+                        radial-gradient(circle at 20% 80%, rgba(255, 64, 129, 0.2), rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+        }
+        
+        /* 메인 콘텐츠 래퍼 - 2/3 너비로 조정 */
+        .main-wrapper {
+            width: 66.67%;
+            margin: 0 auto;
+            position: relative;
+            max-width: 1600px; /* 최대 너비 설정 */
+        }
+        
+        /* 첫 화면 부분 - 새로운 3D 카드 레이아웃 */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px;
+            perspective: 1000px; /* 3D 효과를 위한 원근감 설정 */
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(18, 13, 26, 0.9), rgba(18, 13, 26, 0.7));
+        }
+        
+        .hero-header {
+            padding: 15px 0;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .logo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #FF85A2, #B388FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+        
+        .logo-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            filter: blur(20px);
+            opacity: 0.7;
+            background: linear-gradient(to right, rgba(255, 133, 162, 0.5), rgba(179, 136, 255, 0.5));
+            z-index: -1;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 새로운 3D 카드 갤러리 - 너비 관련 수정 */
+        .profiles-carousel {
+            width: 100%;
+            max-width: 1400px; /* 최대 너비 증가 */
+            height: 500px;
+            position: relative;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+            z-index: 10;
+        }
+        
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            display: flex; /* Flex 추가 */
+            justify-content: center; /* 중앙 정렬 */
+            align-items: center; /* 수직 중앙 정렬 */
+        }
+        
+        .profile-card {
+            position: absolute;
+            width: 340px; /* 카드 너비 증가 */
+            height: 460px; /* 카드 높이 증가 */
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            will-change: transform;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0) 40%);
+            z-index: 2;
+        }
+        
+        .profile-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to top, 
+                rgba(0, 0, 0, 0.7) 0%, 
+                rgba(0, 0, 0, 0) 100%);
+            z-index: 2;
+        }
+        
+        .profile-card.active {
+            z-index: 5;
+        }
+        
+        .profile-card:not(.active) {
+            filter: brightness(0.7);
+        }
+        
+        /* 카드 위치 조정 */
+        .profile-card.left {
+            transform: translateX(-320px) translateZ(-100px) rotateY(20deg);
+        }
+        
+        .profile-card.center {
+            transform: translateZ(0) rotateY(0);
+            z-index: 5;
+        }
+        
+        .profile-card.right {
+            transform: translateX(320px) translateZ(-100px) rotateY(-20deg);
+        }
+        
+        .profile-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+        
+        .profile-card:hover .profile-image {
+            transform: scale(1.05);
+        }
+        
+        .card-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 3;
+            color: white;
+            text-align: left;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            transition-delay: 0.05s;
+        }
+        
+        .profile-card.active .card-title,
+        .profile-card.active .card-subtitle {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .card-badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .badge {
+            padding: 5px 10px;
+            border-radius: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        
+        .badge.hot {
+            background: rgba(255, 64, 129, 0.8);
+        }
+        
+        .badge.online {
+            background: rgba(0, 200, 83, 0.8);
+            display: flex;
+            align-items: center;
+        }
+        
+        .badge.online::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .profile-card.active .badge {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.2s;
+        }
+        
+        .card-shine {
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.25),
+                transparent
+            );
+            transform: skewX(-15deg);
+            z-index: 4;
+            pointer-events: none;
+        }
+        
+        /* 새로운 네비게이션 컨트롤 */
+        .carousel-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .control-btn.prev::before {
+            content: '←';
+        }
+        
+        .control-btn.next::before {
+            content: '→';
+        }
+        
+        /* 배경 효과 */
+        .glow-effect {
+            position: absolute;
+            width: 400px; /* 더 넓은 발광 효과 */
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(255, 133, 162, 0.2) 0%, 
+                rgba(255, 133, 162, 0) 70%);
+            filter: blur(30px);
+            opacity: 0;
+            z-index: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .glow-effect.active {
+            opacity: 1;
+        }
+        
+        .glow-left {
+            top: 50%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, 
+                rgba(255, 133, 162, 0.2) 0%, 
+                rgba(255, 133, 162, 0) 70%);
+        }
+        
+        .glow-center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, 
+                rgba(179, 136, 255, 0.2) 0%, 
+                rgba(179, 136, 255, 0) 70%);
+        }
+        
+        .glow-right {
+            top: 50%;
+            right: 25%;
+            transform: translate(50%, -50%);
+            background: radial-gradient(circle, 
+                rgba(255, 64, 129, 0.2) 0%, 
+                rgba(255, 64, 129, 0) 70%);
+        }
+        
+        /* 갤러리 영역 - CSS 애니메이션으로 무한 스크롤 */
+        .gallery-display {
+            position: relative;
+            width: 100%;
+            height: 80px;
+            margin-top: 40px;
+            overflow: hidden;
+            z-index: 3;
+            margin-bottom: 20px;
+        }
+        
+        .gallery-track {
+            display: flex;
+            position: absolute;
+            height: 100%;
+            padding: 0 10px;
+            width: 100%;
+        }
+        
+        .gallery-content-wrapper {
+            display: flex;
+            gap: 12px;
+            animation: scrollGallery 20s linear infinite;
+        }
+        
+        @keyframes scrollGallery {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+        
+        .gallery-item {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+        
+        .gallery-item.active {
+            border-color: var(--pink-light);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 133, 162, 0.5);
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-3px) scale(1.05);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .gallery-item.active:hover {
+            transform: translateY(-3px) scale(1.15);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* 파티클과 하트 효과 */
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(to right, rgba(255, 133, 162, 0.8), rgba(179, 136, 255, 0.8));
+            filter: blur(1px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .hearts-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff' width='24px' height='24px'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") no-repeat center center;
+            background-size: contain;
+            pointer-events: none;
+            opacity: 0;
+            filter: drop-shadow(0 0 5px rgba(255, 133, 162, 0.8));
+        }
+        
+        /* 스크롤 표시기 */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 40px;
+            z-index: 10;
+        }
+        
+        .scroll-arrow {
+            width: 15px;
+            height: 15px;
+            border-bottom: 2px solid white;
+            border-right: 2px solid white;
+            transform: rotate(45deg);
+            margin: 0 auto;
+            animation: scroll-down 2s infinite;
+        }
+        
+        @keyframes scroll-down {
+            0% {
+                transform: rotate(45deg) translate(-5px, -5px);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: rotate(45deg) translate(5px, 5px);
+                opacity: 0;
+            }
+        }
+        
+        /* 인물 정보 부분 */
+        .profiles-section {
+            position: relative;
+            padding: 40px 20px;
+            background: #120d1a;
+            z-index: 2;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(to right, var(--pink-light), var(--purple-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding-bottom: 10px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--pink-light), var(--purple-light));
+            border-radius: 3px;
+        }
+        
+        .title-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .info-profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .info-profile-card {
+            position: relative;
+            height: 450px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            opacity: 1;
+            background: var(--card-gradient);
+        }
+        
+        .info-profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 40%);
+            z-index: 1;
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+            transition: transform 0.5s ease;
+        }
+        
+        .info-profile-card:hover .card-image {
+            transform: scale(1.05);
+        }
+        
+        .card-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 25px;
+            z-index: 2;
+            opacity: 1;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .meta-badge {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: white;
+        }
+        
+        .meta-badge svg {
+            width: 14px;
+            height: 14px;
+            margin-right: 5px;
+            fill: white;
+        }
+        
+        .status-badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 2;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .online-badge {
+            background: rgba(0, 200, 83, 0.7);
+        }
+        
+        .online-badge::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .verified-badge {
+            background: rgba(123, 31, 162, 0.7);
+        }
+        
+        .card-bio {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+        
+        .popularity-meter {
+            margin-bottom: 15px;
+        }
+        
+        .popularity-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .popularity-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .popularity-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--pink-light), var(--purple-light));
+            border-radius: 3px;
+            animation: fillBar 1.5s ease-out forwards;
+        }
+        
+        @keyframes fillBar {
+            to {
+                width: var(--fill-width);
+            }
+        }
+        
+        .contact-btn {
+            display: inline-block;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 0;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 다운로드 부분 */
+        .download-section {
+            position: relative;
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, #120d1a, #1c1225);
+            overflow: hidden;
+        }
+        
+        .download-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .download-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            z-index: 2;
+        }
+        
+        .download-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--pink-light), var(--purple-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .download-desc {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--pink-deep), var(--purple-deep));
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 100px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .download-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* 플로팅 버튼 */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(to right, var(--pink-deep), var(--purple-deep));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            min-width: 300px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-btn:hover {
+            transform: translateX(-50%) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* 반응형 조정 */
+        @media (max-width: 1200px) {
+            .main-wrapper {
+                width: 85%; /* 모바일에서 더 넓게 사용 */
+            }
+            
+            .profile-card {
+                width: 300px;
+                height: 420px;
+            }
+            
+            .profile-card.left {
+                transform: translateX(-280px) translateZ(-100px) rotateY(20deg);
+            }
+            
+            .profile-card.right {
+                transform: translateX(280px) translateZ(-100px) rotateY(-20deg);
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .main-wrapper {
+                width: 92%;
+            }
+            
+            .hero-section {
+                min-height: auto;
+                height: auto;
+                padding-bottom: 15px;
+            }
+            
+            .profiles-carousel {
+                height: 450px;
+            }
+            
+            .profile-card {
+                width: 240px;
+                height: 350px;
+            }
+            
+            .profile-card.left {
+                transform: translateX(-210px) translateZ(-100px) rotateY(15deg);
+            }
+            
+            .profile-card.right {
+                transform: translateX(210px) translateZ(-100px) rotateY(-15deg);
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .main-wrapper {
+                width: 100%;
+            }
+            
+            .hero-section {
+                padding: 10px 10px;
+                gap: 20px;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
+                margin-bottom: 5px;
+            }
+            
+            .profiles-carousel {
+                height: 400px;
+            }
+            
+            .profile-card {
+                width: 190px;
+                height: 280px;
+            }
+            
+            .profile-card.left {
+                transform: translateX(-160px) translateZ(-80px) rotateY(12deg);
+            }
+            
+            .profile-card.right {
+                transform: translateX(160px) translateZ(-80px) rotateY(-12deg);
+            }
+            
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .gallery-display {
+                margin-top: 20px;
+                height: 70px;
+            }
+            
+            .download-title {
+                font-size: 1.8rem;
+            }
+            
+            .download-desc {
+                font-size: 1rem;
+                margin-bottom: 25px;
+            }
+            
+            .floating-btn {
+                min-width: 280px;
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-header {
+                padding: 10px 0;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .tagline {
+                font-size: 0.9rem;
+                margin-bottom: 3px;
+            }
+            
+            .profiles-carousel {
+                height: 350px;
+            }
+            
+            .profile-card {
+                width: 160px;
+                height: 240px;
+            }
+            
+            .profile-card.left {
+                transform: translateX(-140px) translateZ(-60px) rotateY(10deg);
+            }
+            
+            .profile-card.right {
+                transform: translateX(140px) translateZ(-60px) rotateY(-10deg);
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .gallery-item {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .floating-btn {
+                min-width: 250px;
+                padding: 10px 20px;
+                bottom: 20px;
+            }
+            
+            .scroll-indicator {
+                bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- 첫 화면 부분 -->
+        <section class="hero-section">
+            <div class="hero-bg"></div>
+            <div class="particles-container" id="particlesContainer"></div>
+            <div class="hearts-container" id="heartsContainer"></div>
+            
+            <header class="hero-header">
+                <div class="logo-container">
+                    <h1 class="logo">MOODYZ</h1>
+                    <div class="logo-glow"></div>
+                </div>
+                <p class="tagline">다양한 플레이 방식을 갖춘 대규모 데이트 클럽</p>
+            </header>
+            
+            <!-- 새로운 3D 카드 캐러셀 -->
+            <div class="profiles-carousel">
+                <div class="carousel-container" id="carousel">
+                    <!-- 3D 카드는 JS로 생성됨 -->
+                </div>
+                
+                <!-- 배경 발광 효과 -->
+                <div class="glow-effect glow-left"></div>
+                <div class="glow-effect glow-center active"></div>
+                <div class="glow-effect glow-right"></div>
+                
+                <!-- 캐러셀 컨트롤 -->
+                <div class="carousel-controls">
+                    <div class="control-btn prev" id="prevBtn"></div>
+                    <div class="control-btn next" id="nextBtn"></div>
+                </div>
+            </div>
+            
+            <div class="gallery-display">
+                <div class="gallery-track" id="galleryTrack">
+                    <!-- 갤러리 아이템은 JS로 생성됨 -->
+                </div>
+            </div>
+            
+            <div class="scroll-indicator">
+                <div class="scroll-arrow"></div>
+            </div>
+        </section>
+        
+        <!-- 인물 정보 부분 -->
+        <section class="profiles-section">
+            <div class="title-container">
+                <h2 class="section-title">추천 프로필</h2>
+            </div>
+            
+            <div class="info-profiles-grid" id="profilesGrid">
+                <!-- 프로필 카드는 JS로 동적 생성 -->
+            </div>
+        </section>
+        
+        <!-- 다운로드 부분 -->
+        <section class="download-section">
+            <div class="download-bg"></div>
+            
+            <div class="download-content">
+                <h2 class="download-title">지금 시작하세요</h2>
+                <p class="download-desc">더 많은 고품질 여성을 즉시 만나보세요.</p>
+                <button class="download-btn">지금 바로 시작하기</button>
+            </div>
+        </section>
+    </div>
+    
+    <!-- 플로팅 버튼 -->
+    <button class="floating-btn" id="floatingBtn" onclick="opensite()">지금 바로 시작하기</button>
+    
+    <script>
+        // opensite 함수
+        function opensite() {
+            alert('매칭을 시작합니다!');
+            // window.location.href = "https://www.google.com";
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 이미지 URL 목록
+            const imageUrls = [
+                'img/1.jpg',
+                'img/2.jpg',
+                'img/3.jpg',
+                'img/4.jpg',
+				 'img/15.jpg',
+                'img/16.jpg',
+                'img/17.jpg',
+                'img/5.jpg'
+            ];
+            
+            // 프로필 데이터
+            const profilesData = [
+                {
+                    image: 'img/16.jpg',
+                    name: '지연',
+                    age: 26,
+                    height: 170,
+                    distance: 2.2,
+                    description: '회사 비서, 신나는 경험 좋아함, 수영 즐김',
+                    popularity: 85,
+                    subtitle: '매력적인 비서'
+                },
+                {
+                    image: 'img/17.jpg',
+                    name: '미나',
+                    age: 24,
+                    height: 170,
+                    distance: 1.5,
+                    description: '주부, 짜릿한 경험 추구, 남편 출장 중',
+                    popularity: 90,
+                    subtitle: '짜릿한 경험 추구'
+                },
+                {
+                    image: 'img/18.jpg',
+                    name: '서연',
+                    age: 21,
+                    height: 160,
+                    distance: 1.7,
+                    description: '대학생, 자유분방한 성격, 새로운 경험 추구',
+                    popularity: 95,
+                    subtitle: '자유분방한 대학생'
+                },
+                {
+                    image: 'img/19.jpg',
+                    name: '하나',
+                    age: 28,
+                    height: 174,
+                    distance: 3.2,
+                    description: '방송인, 즐거운 시간 원함, 대학생',
+                    popularity: 88,
+                    subtitle: '즐거운 시간 원함'
+                },
+                {
+                    image: 'img/20.jpg',
+                    name: '소미',
+                    age: 22,
+                    height: 170,
+                    distance: 2.1,
+                    description: '피트니스 강사, 요가 좋아함, 탄력적인 몸매',
+                    popularity: 92,
+                    subtitle: '요가 좋아하는 강사'
+                },
+                {
+                    image: 'img/21.jpg',
+                    name: '소미',
+                    age: 24,
+                    height: 167,
+                    distance: 2.4,
+                    description: '피트니스 강사, 요가 좋아함, 탄력적인 몸매',
+                    popularity: 92,
+                    subtitle: '요가 좋아하는 강사'
+                },
+                {
+                    image: 'img/22.jpg',
+                    name: '소미',
+                    age: 21,
+                    height: 166,
+                    distance: 2.1,
+                    description: '피트니스 강사, 요가 좋아함, 탄력적인 몸매',
+                    popularity: 92,
+                    subtitle: '요가 좋아하는 강사'
+                }
+            ];
+            
+            // 초기화 함수 호출
+            createCarousel();
+            createParticles();
+            createInfiniteGallery();
+            createProfileCards();
+            createHeartAnimation();
+            initEventListeners();
+            
+            // 새로운 3D 캐러셀 생성
+            function createCarousel() {
+                const carousel = document.getElementById('carousel');
+                
+                // 처음 표시할 카드 인덱스
+                let activeIndex = 0;
+                
+                // 캐러셀에 표시할 카드 수 (기본 5개)
+                const totalProfiles = profilesData.length;
+                
+                // 캐러셀 카드 생성
+                for (let i = 0; i < totalProfiles; i++) {
+                    const profileData = profilesData[i];
+                    
+                    const card = document.createElement('div');
+                    card.classList.add('profile-card');
+                    card.dataset.index = i;
+                    
+                    // 초기 위치 설정 (가운데 카드가 활성화)
+                    if (i === activeIndex) {
+                        card.classList.add('center', 'active');
+                    } else if (i === (activeIndex + 1) % totalProfiles) {
+                        card.classList.add('right');
+                    } else if (i === (activeIndex - 1 + totalProfiles) % totalProfiles) {
+                        card.classList.add('left');
+                    } else {
+                        card.style.display = 'none';
+                    }
+                    
+                    // 카드 내용 추가
+                    card.innerHTML = `
+                        <img src="${profileData.image}" alt="${profileData.name}" class="profile-image">
+                        <div class="card-badges">
+                            <div class="badge online">온라인</div>
+                            <div class="badge hot">인기</div>
+                        </div>
+                        <div class="card-content">
+                            <h3 class="card-title">${profileData.name}</h3>
+                            <p class="card-subtitle">${profileData.subtitle}</p>
+                        </div>
+                        <div class="card-shine"></div>
+                    `;
+                    
+                    carousel.appendChild(card);
+                    
+                    // 카드 클릭 이벤트 - 해당 카드가 중앙이 아니면 중앙으로 이동
+                    card.addEventListener('click', function() {
+                        const clickedIndex = parseInt(this.dataset.index);
+                        if (clickedIndex !== activeIndex) {
+                            if ((clickedIndex === (activeIndex + 1) % totalProfiles) || 
+                                (clickedIndex === (activeIndex - 1 + totalProfiles) % totalProfiles)) {
+                                rotateCarousel(clickedIndex);
+                            }
+                        }
+                    });
+                }
+                
+                // 좌우 버튼 이벤트 리스너
+                document.getElementById('prevBtn').addEventListener('click', function() {
+                    const newIndex = (activeIndex - 1 + totalProfiles) % totalProfiles;
+                    rotateCarousel(newIndex);
+                });
+                
+                document.getElementById('nextBtn').addEventListener('click', function() {
+                    const newIndex = (activeIndex + 1) % totalProfiles;
+                    rotateCarousel(newIndex);
+                });
+                
+                // 캐러셀 회전 함수
+                function rotateCarousel(newIndex) {
+                    if (newIndex === activeIndex) return;
+                    
+                    // 기존 활성 카드 비활성화
+                    const cards = document.querySelectorAll('.profile-card');
+                    cards.forEach(card => {
+                        card.classList.remove('left', 'center', 'right', 'active');
+                        card.style.display = 'none';
+                    });
+                    
+                    // 새 위치 설정
+                    activeIndex = newIndex;
+                    
+                    // 활성 카드 설정
+                    cards[activeIndex].classList.add('center', 'active');
+                    cards[activeIndex].style.display = 'block';
+                    
+                    // 좌우 카드 설정
+                    const rightIndex = (activeIndex + 1) % totalProfiles;
+                    const leftIndex = (activeIndex - 1 + totalProfiles) % totalProfiles;
+                    
+                    cards[rightIndex].classList.add('right');
+                    cards[rightIndex].style.display = 'block';
+                    
+                    cards[leftIndex].classList.add('left');
+                    cards[leftIndex].style.display = 'block';
+                    
+                    // 발광 효과 업데이트
+                    const glowEffects = document.querySelectorAll('.glow-effect');
+                    glowEffects.forEach(glow => glow.classList.remove('active'));
+                    
+                    if (cards[activeIndex].classList.contains('center')) {
+                        document.querySelector('.glow-center').classList.add('active');
+                    } else if (cards[activeIndex].classList.contains('left')) {
+                        document.querySelector('.glow-left').classList.add('active');
+                    } else if (cards[activeIndex].classList.contains('right')) {
+                        document.querySelector('.glow-right').classList.add('active');
+                    }
+                    
+                    // 카드 빛 효과 애니메이션
+                    cards.forEach(card => {
+                        if (card.classList.contains('active')) {
+                            animateCardShine(card);
+                        }
+                    });
+                    
+                    // 갤러리 아이템 활성화 업데이트
+                    updateGalleryActiveState(activeIndex);
+                }
+                
+                // 카드 빛 효과 애니메이션
+                function animateCardShine(card) {
+                    const shine = card.querySelector('.card-shine');
+                    anime({
+                        targets: shine,
+                        left: ['150%', '-150%'],
+                        easing: 'easeInOutSine',
+                        duration: 1500,
+                        delay: 300
+                    });
+                }
+                
+                // 초기 카드에 빛 효과 적용
+                setTimeout(() => {
+                    const activeCard = document.querySelector('.profile-card.active');
+                    if (activeCard) {
+                        animateCardShine(activeCard);
+                    }
+                }, 1000);
+                
+                // 갤러리 활성화 상태 업데이트
+                function updateGalleryActiveState(activeIndex) {
+                    const galleryItems = document.querySelectorAll('.gallery-item');
+                    galleryItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // 활성 인덱스와 일치하는 모든 갤러리 아이템 활성화
+                    document.querySelectorAll(`.gallery-item[data-index="${activeIndex}"]`).forEach(item => {
+                        item.classList.add('active');
+                    });
+                }
+            }
+            
+            // 파티클 생성
+            function createParticles() {
+                const particlesContainer = document.getElementById('particlesContainer');
+                const isMobile = window.innerWidth <= 767;
+                const particleCount = isMobile ? 25 : 50;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    const size = Math.random() * 4 + 2;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.opacity = Math.random() * 0.5 + 0.1;
+                    
+                    particlesContainer.appendChild(particle);
+                    
+                    anime({
+                        targets: particle,
+                        translateX: () => anime.random(-60, 60) + 'px',
+                        translateY: () => anime.random(-60, 60) + 'px',
+                        scale: [
+                            { value: 1 },
+                            { value: anime.random(1.3, 2.0) },
+                            { value: 1 }
+                        ],
+                        opacity: [
+                            { value: particle.style.opacity },
+                            { value: anime.random(0.4, 0.8) },
+                            { value: particle.style.opacity }
+                        ],
+                        easing: 'easeInOutSine',
+                        duration: () => anime.random(4000, 8000),
+                        loop: true,
+                        delay: () => anime.random(0, 1000)
+                    });
+                }
+            }
+            
+            // 무한 스크롤 갤러리 생성
+            function createInfiniteGallery() {
+                const galleryTrack = document.getElementById('galleryTrack');
+                
+                // 갤러리 컨텐츠를 감싸는 wrapper 생성
+                const wrapper = document.createElement('div');
+                wrapper.className = 'gallery-content-wrapper';
+                galleryTrack.appendChild(wrapper);
+                
+                // 세트 크기 정의
+                const setSize = imageUrls.length;
+                const totalItems = 10;
+                
+                // 첫 번째 세트 생성
+                for (let i = 0; i < totalItems; i++) {
+                    const imageIndex = i % setSize;
+                    createGalleryItem(wrapper, imageIndex, i);
+                }
+                
+                // 두 번째 세트 생성 (연속 스크롤을 위해)
+                const cloneWrapper = wrapper.cloneNode(true);
+                galleryTrack.appendChild(cloneWrapper);
+                
+                // 클릭 이벤트 다시 부착
+                cloneWrapper.querySelectorAll('.gallery-item').forEach((item, i) => {
+                    const imageIndex = i % setSize;
+                    item.addEventListener('click', function() {
+                        rotateToIndex(imageIndex);
+                    });
+                });
+            }
+            
+            // 갤러리 아이템 생성 헬퍼 함수
+            function createGalleryItem(container, imageIndex, itemIndex) {
+                const galleryItem = document.createElement('div');
+                galleryItem.classList.add('gallery-item');
+                galleryItem.setAttribute('data-index', imageIndex);
+                
+                if (imageIndex === 0) galleryItem.classList.add('active');
+                
+                const img = document.createElement('img');
+                img.src = imageUrls[imageIndex];
+                img.alt = '프로필 이미지';
+                
+                galleryItem.appendChild(img);
+                container.appendChild(galleryItem);
+                
+                // 클릭 이벤트
+                galleryItem.addEventListener('click', function() {
+                    rotateToIndex(imageIndex);
+                });
+            }
+            
+            // 특정 인덱스로 캐러셀 회전
+            function rotateToIndex(index) {
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                // 현재 활성화된 카드 인덱스 찾기
+                const activeCard = document.querySelector('.profile-card.active');
+                if (activeCard) {
+                    const currentIndex = parseInt(activeCard.dataset.index);
+                    
+                    // 클릭한 인덱스가 현재 인덱스와 다르면 회전
+                    if (index !== currentIndex) {
+                        if (index > currentIndex) {
+                            nextBtn.click();
+                        } else {
+                            prevBtn.click();
+                        }
+                    }
+                }
+            }
+            
+            // 프로필 카드 생성
+            function createProfileCards() {
+                const profilesGrid = document.getElementById('profilesGrid');
+                const isMobile = window.innerWidth <= 767;
+                const cardCount = isMobile ? 6 : 10;
+                
+                for (let i = 0; i < cardCount; i++) {
+                    const profileIndex = i % 5;
+                    const profileData = profilesData[profileIndex];
+                    
+                    const profileCard = document.createElement('div');
+                    profileCard.classList.add('info-profile-card');
+                    profileCard.dataset.index = i;
+                    
+                    profileCard.style.setProperty('--fill-width', `${profileData.popularity}%`);
+                    
+                    profileCard.innerHTML = `
+                        <div class="status-badges">
+                            <div class="status-badge online-badge">온라인</div>
+                            <div class="status-badge verified-badge">인증됨</div>
+                        </div>
+                        <img src="${profileData.image}" alt="${profileData.name}" class="card-image">
+                        <div class="card-content">
+                            <h3 class="card-title">${profileData.name}</h3>
+                            <div class="card-meta">
+                                <div class="meta-badge">
+                                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,8.39C13.57,9.4 15.42,10 17.42,10C18.2,10 18.95,9.91 19.67,9.74C19.88,10.45 20,11.21 20,12C20,16.41 16.41,20 12,20C9,20 6.39,18.34 5,15.89L6.75,14V13A1.25,1.25 0 0,1 8,11.75A1.25,1.25 0 0,1 9.25,13V14H12M16,11.75A1.25,1.25 0 0,0 14.75,10.5A1.25,1.25 0 0,0 13.5,11.75A1.25,1.25 0 0,0 14.75,13A1.25,1.25 0 0,0 16,11.75Z" /></svg>
+                                    ${profileData.age}세
+                                </div>
+                                <div class="meta-badge">
+                                    <svg viewBox="0 0 24 24"><path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" /></svg>
+                                    ${profileData.height}cm
+                                </div>
+                                <div class="meta-badge">
+                                    <svg viewBox="0 0 24 24"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" /></svg>
+                                    ${profileData.distance}km
+                                </div>
+                            </div>
+                            <p class="card-bio">${profileData.description}</p>
+                            <div class="popularity-meter">
+                                <div class="popularity-text">
+                                    <span>인기도</span>
+                                    <span>${profileData.popularity}%</span>
+                                </div>
+                                <div class="popularity-bar">
+                                    <div class="popularity-fill"></div>
+                                </div>
+                            </div>
+                            <button class="contact-btn">연락하기</button>
+                        </div>
+                    `;
+                    
+                    profilesGrid.appendChild(profileCard);
+                    
+                    const contactBtn = profileCard.querySelector('.contact-btn');
+                    contactBtn.addEventListener('click', function() {
+                        alert(`${profileData.name}님과 연락을 시작합니다!`);
+                    });
+                }
+            }
+            
+            // 하트 애니메이션 생성
+            function createHeartAnimation() {
+                const heartsContainer = document.getElementById('heartsContainer');
+                const isMobile = window.innerWidth <= 767;
+                
+                function createHeart() {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    
+                    const size = Math.random() * 15 + 10;
+                    heart.style.width = `${size}px`;
+                    heart.style.height = `${size}px`;
+                    heart.style.left = `${Math.random() * 100}%`;
+                    heart.style.bottom = '0';
+                    
+                    heartsContainer.appendChild(heart);
+                    
+                    anime({
+                        targets: heart,
+                        translateY: () => -anime.random(200, 400),
+                        translateX: () => anime.random(-60, 60),
+                        rotate: () => anime.random(-180, 180),
+                        opacity: [0, () => anime.random(0.5, 0.8), 0],
+                        scale: [0.5, () => anime.random(0.8, 1.3), 0.5],
+                        easing: 'easeOutExpo',
+                        duration: () => anime.random(3000, 6000),
+                        complete: function() {
+                            heart.remove();
+                        }
+                    });
+                }
+                
+                const heartInterval = isMobile ? 500 : 300;
+                setInterval(createHeart, heartInterval);
+                
+                const initialHearts = isMobile ? 8 : 15;
+                for (let i = 0; i < initialHearts; i++) {
+                    setTimeout(createHeart, i * 200);
+                }
+            }
+            
+            // 이벤트 리스너 초기화
+            function initEventListeners() {
+                document.querySelector('.download-btn').addEventListener('click', function() {
+                    alert('앱 다운로드를 시작합니다...');
+                });
+                
+                document.getElementById('floatingBtn').addEventListener('click', function() {
+                    opensite();
+                });
+                
+                // 화면 크기 변경에 따른 UI 최적화
+                window.addEventListener('resize', function() {
+                    // 현재 활성화된 카드를 찾고 회전 애니메이션 다시 적용
+                    const activeCard = document.querySelector('.profile-card.active');
+                    if (activeCard) {
+                        const activeIndex = parseInt(activeCard.dataset.index);
+                        document.querySelectorAll('.profile-card').forEach(card => {
+                            const index = parseInt(card.dataset.index);
+                            
+                            // 화면 크기에 맞게 카드 위치 조정
+                            if (index === activeIndex) {
+                                card.classList.add('center', 'active');
+                            } else if (index === (activeIndex + 1) % profilesData.length) {
+                                card.classList.add('right');
+                            } else if (index === (activeIndex - 1 + profilesData.length) % profilesData.length) {
+                                card.classList.add('left');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
